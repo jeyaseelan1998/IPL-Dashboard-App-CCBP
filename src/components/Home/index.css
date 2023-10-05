@@ -1,1 +1,11 @@
 /* Write your CSS here */
+.home-bg-container {
+  min-height: 100vh;
+  background-image: url('https://assets.ccbp.in/frontend/react-js/ipl-dashboard-lg-bg.png');
+}
+
+@media screen and (max-width: 767px) {
+  .home-bg-container {
+    background-image: url('https://assets.ccbp.in/frontend/react-js/ipl-dashboard-sm-bg.png');
+  }
+}

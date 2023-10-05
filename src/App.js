@@ -1,5 +1,7 @@
+import Home from './components/Home'
+
 import './App.css'
 
-const App = () => <h1>Remove this heading and write your code here</h1>
+const App = () => <Home />
 
 export default App
