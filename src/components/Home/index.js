@@ -1,63 +1,76 @@
-import {useState, useEffect} from 'react'
+import {Component} from 'react'
 import Loader from 'react-loader-spinner'
+
+import TeamCard from '../TeamCard'
 
 import './index.css'
 
-const Home = () => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [teamsData, setTeamsData] = useState([])
+const teamsApiUrl = 'https://apis.ccbp.in/ipl'
 
-  const getTeamsData = async () => {
-    const apiUrl = 'https://apis.ccbp.in/ipl'
-    const response = await fetch(apiUrl)
-    const data = await response.json()
-    const updatedData = data.teams.map(team => ({
-      id: team.id,
-      name: team.name,
-      teamImageUrl: team.team_image_url,
-    }))
-
-    setTeamsData(updatedData)
-    setIsLoading(false)
+class Home extends Component {
+  state = {
+    isLoading: true,
+    teamsData: [],
   }
 
-  useEffect(() => {
-    getTeamsData()
-  }, [])
+  componentDidMount() {
+    this.getTeams()
+  }
 
-  const renderLoader = () => (
-    // eslint-disable-next-line react/no-unknown-property
-    <div testid="loader m-auto">
-      <Loader type="Oval" color="#ffffff" height={50} width={50} />{' '}
-    </div>
-  )
+  getTeams = async () => {
+    const response = await fetch(teamsApiUrl)
+    const fetchedData = await response.json()
+    const formattedData = fetchedData.teams.map(team => ({
+      name: team.name,
+      id: team.id,
+      teamImageURL: team.team_image_url,
+    }))
 
-  const renderSuccessView = () => (
-    <div>
-      <div>
-        <img
-          src="https://assets.ccbp.in/frontend/react-js/ipl-logo-img.png"
-          alt="ipl logo"
-        />
-        <h1>IPL Dashboard</h1>
-      </div>
+    this.setState({
+      teamsData: formattedData,
+      isLoading: false,
+    })
+  }
 
-      <ul className="ps-0">
+  renderTeamsList = () => {
+    const {teamsData} = this.state
+
+    return (
+      <ul className="teams-list">
+        {/* FIX6: The list of team cards should be rendered using Array.map() method */}
         {teamsData.map(team => (
-          <li key={team.id}>
-            <img src={team.teamImageUrl} alt={team.name} />
-            <p>{team.name}</p>
-          </li>
+          <TeamCard teamDetails={team} key={team.id} />
         ))}
       </ul>
+    )
+  }
+
+  renderLoader = () => (
+    // FIX7: For the purpose of testing here data-testid attribute should be added with the value "loader"
+    <div data-testid="loader" className="loader-container">
+      <Loader type="Oval" color="#ffffff" height={50} />
     </div>
   )
 
-  return (
-    <div className="home-bg-container d-flex">
-      {!isLoading ? renderLoader() : renderSuccessView()}
-    </div>
-  )
+  render() {
+    const {isLoading} = this.state
+
+    return (
+      <div className="home-route-container">
+        <div className="teams-list-container">
+          <div className="ipl-dashboard-heading-container">
+            <img
+              src="https://assets.ccbp.in/frontend/react-js/ipl-logo-img.png"
+              alt="ipl logo"
+              className="ipl-logo"
+            />
+            <h1 className="ipl-dashboard-heading">IPL Dashboard</h1>
+          </div>
+          {isLoading ? this.renderLoader() : this.renderTeamsList()}
+        </div>
+      </div>
+    )
+  }
 }
 
 export default Home
